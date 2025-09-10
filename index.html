@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EEG Source Coupling Study - SURGE 2024 Research</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #141414;
+            --text-primary: #e4e4e7;
+            --text-secondary: #a1a1aa;
+            --accent: #3b82f6;
+            --accent-hover: #60a5fa;
+            --border: #27272a;
+            --gradient-1: #3b82f6;
+            --gradient-2: #8b5cf6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-hover);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 900px;
+            padding: 0 2rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .hero .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .meta-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .meta-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            background: var(--bg-card);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Section Styles */
+        section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+
+        /* Abstract Card */
+        .abstract-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .abstract-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gradient-1), var(--gradient-2));
+        }
+
+        /* Methods Grid */
+        .methods-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .method-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .method-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.1);
+        }
+
+        .method-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .method-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .method-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Results Section */
+        .results-container {
+            display: grid;
+            gap: 3rem;
+        }
+
+        .result-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .result-content {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .result-highlight {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid var(--accent);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        /* Key Findings */
+        .findings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .finding-card {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .finding-card:hover {
+            border-color: var(--accent);
+        }
+
+        .finding-number {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .finding-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Team Section */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .team-member {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .member-role {
+            color: var(--accent);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .member-name {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .member-affiliation {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-secondary);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.75rem;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="nav-logo">SURGE 2024</div>
+            <ul class="nav-links">
+                <li><a href="#abstract">Abstract</a></li>
+                <li><a href="#methodology">Methodology</a></li>
+                <li><a href="#results">Results</a></li>
+                <li><a href="#team">Team</a></li>
+                <li><a href="#resources">Resources</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>EEG Source Derived Coupling Between rAI and dACC in Patch Foraging Task</h1>
+            <p class="subtitle">Investigating neural mechanisms underlying decision-making processes using advanced EEG analysis</p>
+            
+            <div class="hero-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Research Program</span>
+                    <span class="meta-value">SURGE 2024</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Institution</span>
+                    <span class="meta-value">IIT Kanpur</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Department</span>
+                    <span class="meta-value">BSBE</span>
+                </div>
+            </div>
+            
+            <div class="cta-buttons">
+                <a href="https://github.com/Ashwin-Chaubey/EEG-source-derived-coupling-between-rAI-and-dACC" target="_blank" class="btn btn-primary">
+                    View on GitHub →
+                </a>
+                <a href="https://drive.google.com/file/d/1ewbHDIsWC5cLbHeEsVLI7rt-Z7Jgqugi/view?usp=sharing" target="_blank" class="btn btn-secondary">
+                    View Poster
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Abstract Section -->
+    <section id="abstract">
+        <h2 class="section-title">Abstract</h2>
+        <p class="section-subtitle">Overview of the research objectives and findings</p>
+        
+        <div class="abstract-card">
+            <p style="margin-bottom: 1.5rem;">Understanding the neural mechanisms underlying decision-making processes is critical in cognitive neuroscience. This study investigates the coupling between the right anterior insula (rAI) and dorsal anterior cingulate cortex (dACC) during different decisions in a patch-foraging task using electroencephalography (EEG) data.</p>
+            
+            <p style="margin-bottom: 1.5rem;">The project aims to elucidate the dynamic interactions within the salience network, which is crucial for adaptive behaviour and decision-making. Using pre-collected EEG data from participants engaged in a patch-foraging task, we employed advanced analysis techniques including source localisation with Recursive Sparse Bayesian Learning (RSBL) and Transfer Entropy analysis.</p>
+            
+            <p>The results revealed significant connectivity patterns, with variations observed between 'stay' and 'leave' decisions, indicating the differential engagement of the salience network during decision-making. These findings contribute to our understanding of the neural substrates of decision-making and highlight the importance of the rAI-dACC coupling in adaptive behaviour.</p>
+        </div>
+    </section>
+
+    <!-- Methodology Section -->
+    <section id="methodology">
+        <h2 class="section-title">Methodology</h2>
+        <p class="section-subtitle">Advanced techniques employed in the analysis</p>
+        
+        <div class="methods-grid">
+            <div class="method-card">
+                <div class="method-icon">📊</div>
+                <h3 class="method-title">Data Collection</h3>
+                <p class="method-description">32-channel EEG recordings at 500 Hz sampling rate during patch-foraging task with 5 participants</p>
+            </div>
+            
+            <div class="method-card">
+                <div class="method-icon">🧹</div>
+                <h3 class="method-title">Preprocessing</h3>
+                <p class="method-description">EEGLAB-based pipeline including filtering (0.5-49 Hz), re-referencing with FCz, and artifact rejection using Cleanline</p>
+            </div>
+            
+            <div class="method-card">
+                <div class="method-icon">🧠</div>
+                <h3 class="method-title">Source Localisation</h3>
+                <p class="method-description">Recursive Sparse Bayesian Learning (RSBL) algorithm to identify brain regions of interest</p>
+            </div>
+            
+            <div class="method-card">
+                <div class="method-icon">📈</div>
+                <h3 class="method-title">Transfer Entropy</h3>
+                <p class="method-description">Kraskov's method for measuring directional information flow between rAI and dACC</p>
+            </div>
+            
+            <div class="method-card">
+                <div class="method-icon">🔄</div>
+                <h3 class="method-title">Cross-Correlation</h3>
+                <p class="method-description">Temporal relationship analysis between brain regions using MATLAB's xcorr function</p>
+            </div>
+            
+            <div class="method-card">
+                <div class="method-icon">⏱️</div>
+                <h3 class="method-title">Epoching</h3>
+                <p class="method-description">Segmentation of data from -1000ms to 0ms relative to decision onset for stay/leave events</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results">
+        <h2 class="section-title">Key Results</h2>
+        <p class="section-subtitle">Significant findings from the analysis</p>
+        
+        <div class="results-container">
+            <div class="result-item">
+                <h3 class="result-title">Environment 1: Short Travel Times</h3>
+                <div class="result-content">
+                    <p>Transfer entropy analysis revealed progressive strengthening of information flow between rAI and dACC:</p>
+                    <div class="result-highlight">
+                        <strong>Key Finding:</strong> Consistent increase from Stay 1 to Stay 5, with significant drop during leave decisions, suggesting reduced coordination when transitioning between patches.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-item">
+                <h3 class="result-title">Environment 2: Long Travel Times</h3>
+                <div class="result-content">
+                    <p>Higher variability in transfer entropy patterns reflecting increased cognitive load:</p>
+                    <div class="result-highlight">
+                        <strong>Key Finding:</strong> Notable increases at Stay 4 and Stay 5, indicating heightened cognitive engagement in more challenging environments.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-item">
+                <h3 class="result-title">dACC Activity Patterns</h3>
+                <div class="result-content">
+                    <p>Fluctuations in dACC activity aligned with critical decision points:</p>
+                    <div class="result-highlight">
+                        <strong>Key Finding:</strong> Peak activity reflected moments of maximum cognitive control and attention during the foraging task.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="findings-grid">
+            <div class="finding-card">
+                <div class="finding-number">5</div>
+                <div class="finding-label">Participants Analyzed</div>
+            </div>
+            <div class="finding-card">
+                <div class="finding-number">32</div>
+                <div class="finding-label">EEG Channels</div>
+            </div>
+            <div class="finding-card">
+                <div class="finding-number">500Hz</div>
+                <div class="finding-label">Sampling Rate</div>
+            </div>
+            <div class="finding-card">
+                <div class="finding-number">2</div>
+                <div class="finding-label">Environments Tested</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team">
+        <h2 class="section-title">Research Team</h2>
+        <p class="section-subtitle">Contributors to this project</p>
+        
+        <div class="team-grid">
+            <div class="team-member">
+                <div class="member-role">Lead Researcher</div>
+                <div class="member-name">Ashwin Chaubey</div>
+                <div class="member-affiliation">SURGE 2024 Fellow</div>
+            </div>
+            
+            <div class="team-member">
+                <div class="member-role">Principal Investigator</div>
+                <div class="member-name">Dr. Arjun Ramakrishnan</div>
+                <div class="member-affiliation">Professor, BSBE, IIT Kanpur</div>
+            </div>
+            
+            <div class="team-member">
+                <div class="member-role">Research Mentor</div>
+                <div class="member-name">Peeusa Mitra</div>
+                <div class="member-affiliation">PhD Student, IIT Kanpur</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section id="resources">
+        <h2 class="section-title">Resources & Links</h2>
+        <p class="section-subtitle">Access the code, data, and additional materials</p>
+        
+        <div class="methods-grid">
+            <div class="method-card">
+                <div class="method-icon">💻</div>
+                <h3 class="method-title">GitHub Repository</h3>
+                <p class="method-description">MATLAB scripts, source localisation visualisations, ROI power time series, and JIDT toolbox code</p>
+                <a href="https://github.com/Ashwin-Chaubey/EEG-source-derived-coupling-between-rAI-and-dACC" target="_blank" class="btn btn-secondary" style="margin-top: 1rem;">View Code →</a>
+            </div>
+            
+            <div class="method-card">
+                <div class="method-icon">📄</div>
+                <h3 class="method-title">Research Poster</h3>
+                <p class="method-description">Visual summary of the research presented at SURGE 2024</p>
+                <a href="https://drive.google.com/file/d/1ewbHDIsWC5cLbHeEsVLI7rt-Z7Jgqugi/view?usp=sharing" target="_blank" class="btn btn-secondary" style="margin-top: 1rem;">View Poster →</a>
+            </div>
+            
+            <div class="method-card">
+                <div class="method-icon">🏛️</div>
+                <h3 class="method-title">Institution</h3>
+                <p class="method-description">Department of Biological Sciences and Bioengineering, IIT Kanpur</p>
+                <a href="https://www.iitk.ac.in/bsbe/" target="_blank" class="btn btn-secondary" style="margin-top: 1rem;">Visit BSBE →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-links">
+            <a href="https://github.com/Ashwin-Chaubey/EEG-source-derived-coupling-between-rAI-and-dACC" target="_blank">GitHub</a>
+            <a href="https://www.iitk.ac.in/surge/" target="_blank">SURGE Program</a>
+            <a href="https://www.iitk.ac.in/bsbe/" target="_blank">BSBE Department</a>
+        </div>
+        <p style="color: var(--text-secondary);">© 2024 SURGE Research Project | IIT Kanpur</p>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add fade-in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll('section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            observer.observe(section);
+        });
+
+        // Active nav link highlighting
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const sections = document.querySelectorAll('section[id]');
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.style.color = '';
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.style.color = 'var(--accent)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
